@@ -1,7 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 
 public class Plate : MonoBehaviour
@@ -16,6 +15,11 @@ public class Plate : MonoBehaviour
     public AudioClip DingSound;
     public AudioClip Endtest;
     public GameObject WrongSe1;
+    public Button CorrectAnswerButton;
+    public Button WrongAnswerButton;
+    public Button CorrectAnswerButton6;
+    public Button WrongAnswerButton6;
+    public test toggleChecker;  // Reference to the `test` script
 
     private AudioSource audioSource;
 
@@ -27,24 +31,48 @@ public class Plate : MonoBehaviour
     private void Start()
     {
         ro1.text = "0.00g";
+        CorrectAnswerButton.onClick.AddListener(HandleCorrectAnswer);
+        WrongAnswerButton.onClick.AddListener(HandleWrongAnswer);
+        CorrectAnswerButton6.onClick.AddListener(HandleCorrectAnswer6);
+        WrongAnswerButton6.onClick.AddListener(HandleWrongAnswer6);
+    }
+
+    private void HandleCorrectAnswer()
+    {
+        Alltoggles[2].GetComponent<Toggle>().isOn = true;  // Assuming the correct toggle is at index 2
+        audioSource.PlayOneShot(DingSound);  // Optional: play a sound for correct answer
+        toggleChecker.Cheak();  // Call the Cheak method to check if all toggles are on
+    }
+    private void HandleCorrectAnswer6()
+    {
+        Alltoggles[5].GetComponent<Toggle>().isOn = true;  // Assuming the correct toggle for question 6 is at index 5
+        audioSource.PlayOneShot(DingSound);  // Optional: play a sound for correct answer
+        toggleChecker.Cheak();  // Call the Cheak method to check if all toggles are on
+    }
+
+    private void HandleWrongAnswer6()
+    {
+        StartCoroutine(ro5sec());
+    }
+    private void HandleWrongAnswer()
+    {
+        StartCoroutine(ro5sec());
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-
         if (collision.gameObject.tag == "Beaker")
         {
             if (Alltoggles[3].GetComponent<Toggle>().isOn == true)
             {
                 Debug.Log("IN");
                 float currentFill = rend.material.GetFloat("_Fill");
-                currentFill = currentFill * 733.4f;
+                currentFill = currentFill * 733f;
                 ro1.text = currentFill.ToString("F0") + ("g");
                 img.color = Color.black;
-                //StartCoroutine(wait());
                 Alltoggles[4].GetComponent<Toggle>().isOn = true;
                 audioSource.PlayOneShot(DingSound);
-                audioSource.PlayOneShot(Endtest);
+                toggleChecker.Cheak();  // Call the Cheak method to check if all toggles are on
             }
             else
             {
@@ -54,19 +82,17 @@ public class Plate : MonoBehaviour
 
         if (collision.gameObject.tag == "Beaker1")
         {
-            if (Alltoggles[1].GetComponent<Toggle>().isOn == true)
+            if (collision.gameObject.tag == "Beaker1")
             {
-                Debug.Log("IN");
-                float currentFill = rend.material.GetFloat("_Fill");
-                currentFill = currentFill * 100f;
-                ro1.text = currentFill.ToString("F0") + ("cm3");
-                img.color = Color.black;
-                Alltoggles[2].GetComponent<Toggle>().isOn = true;
-                audioSource.PlayOneShot(DingSound);
-            }
-            else
-            {
-                StartCoroutine(ro5sec());
+
+                {
+                    Debug.Log("IN");
+                    float currentFill = rend.material.GetFloat("_Fill");
+                    currentFill = currentFill * -100f;
+                    ro1.text = currentFill.ToString("F0") + ("cm3");
+                    img.color = Color.black;
+                }
+
             }
         }
 
@@ -77,8 +103,10 @@ public class Plate : MonoBehaviour
             img.color = Color.black;
             Alltoggles[0].GetComponent<Toggle>().isOn = true;
             audioSource.PlayOneShot(DingSound);
+            toggleChecker.Cheak();  // Call the Cheak method to check if all toggles are on
         }
     }
+
     IEnumerator ro5sec()
     {
         WrongSe1.SetActive(true);
@@ -93,7 +121,6 @@ public class Plate : MonoBehaviour
             Debug.Log("OUT");
             ro1.text = "0.0g";
             img.color = Color.black;
-            //StartCoroutine(wait());
         }
 
         if (collision.gameObject.tag == "Beaker1")
@@ -101,7 +128,6 @@ public class Plate : MonoBehaviour
             Debug.Log("OUT");
             ro1.text = "0.0g";
             img.color = Color.black;
-            //StartCoroutine(wait());
         }
 
         if (collision.gameObject.tag == "Metal")
@@ -109,23 +135,6 @@ public class Plate : MonoBehaviour
             Debug.Log("OUT");
             ro1.text = "0.0g";
             img.color = Color.black;
-            //StartCoroutine(wait());
         }
     }
-
-
-    public IEnumerator wait()
-    {
-        yield return new WaitForSeconds(2f);
-        ro1.text = "0.0g";
-    }
-
-    private void WeightCheck()
-    {
-
-        float currentFill = rend.material.GetFloat("_Fill");
-        rend.material.SetFloat("_Fill", currentFill);
-
-    }
-
 }
